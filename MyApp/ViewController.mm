@@ -114,7 +114,8 @@
     
     if (_currentTrackedAnimationsUUID == nil) return;
     
-    UIViewPropertyAnimator *animator = ((id (*)(Class, SEL, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_animatorForTrackedAnimationsUUID:"), _currentTrackedAnimationsUUID);
+    // _UIViewPropertyAnimatorTrackingGroup
+    id<UIViewAnimating> animator = ((id (*)(Class, SEL, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_animatorForTrackedAnimationsUUID:"), _currentTrackedAnimationsUUID);
     
     animator.fractionComplete = sender.value;
     
@@ -127,8 +128,7 @@
 - (void)animateOrangeView {
     UIView *orangeView = self.orangeView;
     
-    // 내부적으로 자동으로 +[UIViewPropertyAnimator _saveTrackingAnimator:forUUID:andDescription:]를 호출해서 현재 Tracked Animator에 추가될 것
-    [UIView animateWithDuration:3.0 animations:^{
+    UIViewPropertyAnimator *animator = [[UIViewPropertyAnimator alloc] initWithDuration:3.0 curve:UIViewAnimationCurveEaseInOut animations:^{
         [self.view removeConstraints:self.view.constraints];
         [orangeView removeConstraints:orangeView.constraints];
         [NSLayoutConstraint activateConstraints:@[
@@ -138,8 +138,9 @@
             [orangeView.heightAnchor constraintEqualToConstant:200.]
         ]];
         [self.view layoutIfNeeded];
-    } 
-                     completion:^(BOOL finished) {
+    }];
+    
+    [animator addCompletion:^(UIViewAnimatingPosition finalPosition) {
         [self.view removeConstraints:self.view.constraints];
         [orangeView removeConstraints:orangeView.constraints];
         [NSLayoutConstraint activateConstraints:@[
@@ -149,6 +150,38 @@
             [orangeView.heightAnchor constraintEqualToConstant:100.]
         ]];
     }];
+    
+    
+    NSUUID *_currentTrackedAnimationsUUID = ((id (*)(Class, SEL))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_currentTrackedAnimationsUUID"));
+    ((void (*)(Class, SEL, id, id, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_saveTrackingAnimator:forUUID:andDescription:"), animator, _currentTrackedAnimationsUUID, nil);
+    
+    
+    UIViewPropertyAnimator *_animator = ((id (*)(Class, SEL, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_animatorForTrackedAnimationsUUID:"), _currentTrackedAnimationsUUID);
+    
+    [animator release];
+    
+    // 내부적으로 자동으로 +[UIViewPropertyAnimator _saveTrackingAnimator:forUUID:andDescription:]를 호출해서 현재 Tracked Animator에 추가될 것
+//    [UIView animateWithDuration:3.0 animations:^{
+//        [self.view removeConstraints:self.view.constraints];
+//        [orangeView removeConstraints:orangeView.constraints];
+//        [NSLayoutConstraint activateConstraints:@[
+//            [orangeView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
+//            [orangeView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor],
+//            [orangeView.widthAnchor constraintEqualToConstant:200.],
+//            [orangeView.heightAnchor constraintEqualToConstant:200.]
+//        ]];
+//        [self.view layoutIfNeeded];
+//    } 
+//                     completion:^(BOOL finished) {
+//        [self.view removeConstraints:self.view.constraints];
+//        [orangeView removeConstraints:orangeView.constraints];
+//        [NSLayoutConstraint activateConstraints:@[
+//            [orangeView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
+//            [orangeView.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor],
+//            [orangeView.widthAnchor constraintEqualToConstant:100.],
+//            [orangeView.heightAnchor constraintEqualToConstant:100.]
+//        ]];
+//    }];
 }
 
 @end
