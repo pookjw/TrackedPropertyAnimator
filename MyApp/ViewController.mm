@@ -155,9 +155,6 @@
     NSUUID *_currentTrackedAnimationsUUID = ((id (*)(Class, SEL))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_currentTrackedAnimationsUUID"));
     ((void (*)(Class, SEL, id, id, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_saveTrackingAnimator:forUUID:andDescription:"), animator, _currentTrackedAnimationsUUID, nil);
     
-    
-    UIViewPropertyAnimator *_animator = ((id (*)(Class, SEL, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_animatorForTrackedAnimationsUUID:"), _currentTrackedAnimationsUUID);
-    
     [animator release];
     
     // 내부적으로 자동으로 +[UIViewPropertyAnimator _saveTrackingAnimator:forUUID:andDescription:]를 호출해서 현재 Tracked Animator에 추가될 것
