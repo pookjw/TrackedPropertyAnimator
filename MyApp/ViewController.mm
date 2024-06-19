@@ -117,6 +117,11 @@
     UIViewPropertyAnimator *animator = ((id (*)(Class, SEL, id))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_animatorForTrackedAnimationsUUID:"), _currentTrackedAnimationsUUID);
     
     animator.fractionComplete = sender.value;
+    
+    if (sender.value >= 1.f) {
+        [animator stopAnimation:YES];
+        ((void (*)(Class, SEL))objc_msgSend)(UIViewPropertyAnimator.class, sel_registerName("_finishTrackingAnimations"));
+    }
 }
 
 - (void)animateOrangeView {
